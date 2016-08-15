@@ -1,0 +1,122 @@
+@SuppressWarnings("unchecked")
+  public String fetchUsersJSON()
+      throws Exception {
+    List<String> selectedIdList = new ArrayList<String>();
+    List<String> selctedRequestorIdList = new ArrayList<String>();
+    for (AdvanceSearchObject advSearchObj : ((ReportBean) this)
+        .getAdvSearchObjList()) {
+      if (advSearchObj.getSearchOption() != null
+          && !advSearchObj.getSearchOption().isEmpty()) {
+        if (advSearchObj.getSearchOption().equalsIgnoreCase(
+            Constants.ADV_SEARCH_OPT_REQUESTOR)) {
+          selctedRequestorIdList.addAll(advSearchObj.getSelectedIdList());
+        } else {
+          selectedIdList.addAll(advSearchObj.getSelectedIdList());
+        }
+      }
+    }
+    String calledFrom = ComponentHelper.getRequestParams().get(
+        RequestParams.calledFrom);
+    Object[] objectArrayData = null;
+    if (calledFrom.equalsIgnoreCase(Constants.xx_REPORT)) {
+      selectedIdList.addAll(this.getAddedIdList());
+      objectArrayData = this.userService.fetchUsersBySearchText(getContext(),
+          this.getLoggedInUser(), selectedIdList, this.checkIsAdmin(),
+          calledFrom);
+    }
+    return this.buildJsonResponse(
+        ((List<_Identity>) objectArrayData[1]).size(),
+        (Integer) objectArrayData[0], objectArrayData[1]);
+  }
+
+  /**
+   * Fetch All privileges
+   * 
+   * @return
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  public String getAllPrivJSON()
+      throws Exception {
+    List<String> selectedIdList = new ArrayList<String>();
+    for (AdvanceSearchObject advSearchObj : this.getAdvSearchObjList()) {
+      if (advSearchObj.getSearchOption() != null
+          && !advSearchObj.getSearchOption().isEmpty()
+          && advSearchObj.getSearchOption().equalsIgnoreCase(
+              Constants.ADV_SEARCH_OPT_ROLES)) {
+        selectedIdList.addAll(advSearchObj.getSelectedIdList());
+      }
+    }
+    selectedIdList.addAll(this.getAddedIdList());
+    String calledFrom = ComponentHelper.getRequestParams().get(
+        RequestParams.calledFrom);
+
+    Object[] objectArrayData = null;
+    if (calledFrom.equalsIgnoreCase(Constants.CALLED_FROM_APPSUPPORTROLES)) {
+      objectArrayData = this.bundleService.fetchPrivilegesBySearchText(
+          getContext(), this.getRolesDataTableHeaders(), this
+              .getLoggedInUserDetails().getSupportGroupAppIds(),
+          selectedIdList, Constants.ROLE, this.getLoggedInUserDetails(), this
+              .checkIsAdmin(), calledFrom);
+    } else {
+      objectArrayData = this.bundleService.fetchPrivilegesBySearchText(
+          getContext(), this.getRolesDataTableHeaders(), null, selectedIdList,
+          Constants.ROLE, this.getLoggedInUserDetails(), this.checkIsAdmin(),
+          calledFrom);
+    }
+    return this.buildJsonResponse(((List<_Bundle>) objectArrayData[1]).size(),
+        (Integer) objectArrayData[0], objectArrayData[1]);
+  }
+
+  /**
+   * Fetch All Configured Applications
+   * 
+   * @return
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  public String getAllAppJSON()
+      throws Exception {
+    List<String> selectedAppIdList = new ArrayList<String>();
+    for (AdvanceSearchObject advSearchObj : this.getAdvSearchObjList()) {
+      if (advSearchObj.getSearchOption() != null
+          && !advSearchObj.getSearchOption().isEmpty()
+          && advSearchObj.getSearchOption().equalsIgnoreCase(
+              Constants.ADV_SEARCH_OPT_APPLICATIONS)) {
+        selectedAppIdList.addAll(advSearchObj.getSelectedIdList());
+      }
+    }
+    selectedAppIdList.addAll(this.getAddedIdList());
+    String calledFrom = ComponentHelper.getRequestParams().get(
+        RequestParams.calledFrom);
+    Object[] objectArrayData = this.appService.fetchConfiguredAppsBySearchText(
+        getContext(), this.getLoggedInUserDetails(), selectedAppIdList,
+        this.checkIsAdmin(), calledFrom, false);
+    return this.buildJsonResponse(
+        ((List<_ConfiguredApplication>) objectArrayData[1]).size(),
+        (Integer) objectArrayData[0], objectArrayData[1]);
+  }
+
+  /**
+   * 
+   * @return
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  public String getAllRequestIdJSON()
+      throws Exception {
+    List<String> selectedRequestIdList = new ArrayList<String>();
+    for (AdvanceSearchObject advSearchObj : this.getAdvSearchObjList()) {
+      if (advSearchObj.getSearchOption() != null
+          && !advSearchObj.getSearchOption().isEmpty()
+          && advSearchObj.getSearchOption().equalsIgnoreCase(
+              Constants.ADV_SEARCH_OPT_REQUEST_ID)) {
+        selectedRequestIdList.addAll(advSearchObj.getSelectedIdList());
+      }
+    }
+    selectedRequestIdList.addAll(this.getAddedIdList());
+    Object[] objectArrayData = this.trackService.fetchRequestIdBySearchText(
+        getContext(), selectedRequestIdList, this.getLoggedInUserDetails(),
+        ((List<_ConfiguredApplication>) objectArrayData[1]).size(),
+        (Integer) objectArrayData[0], objectArrayData[1]);
+  }
